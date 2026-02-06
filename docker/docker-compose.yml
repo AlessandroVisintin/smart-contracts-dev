@@ -1,0 +1,59 @@
+services:
+
+  init:
+    image: ghcr.io/foundry-rs/foundry:${FOUNDRY_VERSION:-latest}
+    environment:
+      - FOUNDRY_FLD=${FOUNDRY_FLD:-}
+    volumes:
+      - ${FOUNDRY_FLD:-/tmp}:/app/foundry
+    entrypoint: ["sh", "-ec"]
+    command: 
+      - |
+        forge init --empty --no-git /app/foundry
+
+  build:
+    image: ghcr.io/foundry-rs/foundry:${FOUNDRY_VERSION:-latest}
+    environment:
+      - FOUNDRY_FLD=${FOUNDRY_FLD:-}
+      - SOURCE_FLD=${SOURCE_FLD:-}
+      - OUTPUT_FLD=${OUTPUT_FLD:-}
+      - SOLIDITY_VERSION=${SOLIDITY_VERSION:-}
+      - EVM_VERSION=${EVM_VERSION:-}
+    volumes:
+      - ${FOUNDRY_FLD:-}:/app/foundry
+      - ${SOURCE_FLD:-}:/app/foundry/src
+      - ${OUTPUT_FLD:-}:/app/foundry/out
+    working_dir: /app/foundry
+    entrypoint: ["sh", "-ec"]
+    command: 
+      - |
+        forge build \
+          --contracts "/app/foundry/src" \
+          --out "/app/foundry/out" \
+          --lib-paths "/app/foundry/lib" \
+          --use "$$SOLIDITY_VERSION" \
+          --evm-version "$$EVM_VERSION"
+
+  test:
+    image: ghcr.io/foundry-rs/foundry:${FOUNDRY_VERSION:-latest}
+    environment:
+      - FOUNDRY_FLD=${FOUNDRY_FLD:-}
+      - SOURCE_FLD=${SOURCE_FLD:-}
+      - OUTPUT_FLD=${OUTPUT_FLD:-}
+      - SOLIDITY_VERSION=${SOLIDITY_VERSION:-}
+      - EVM_VERSION=${EVM_VERSION:-}
+    volumes:
+      - ${FOUNDRY_FLD:-}:/app/foundry
+      - ${SOURCE_FLD:-}:/app/foundry/src
+      - ${OUTPUT_FLD:-}:/app/foundry/out
+      - ${TESTS_FLD:-}:/app/foundry/test
+    working_dir: /app/foundry
+    entrypoint: ["sh", "-ec"]
+    command: 
+      - |
+        forge test \
+          --contracts "/app/foundry/src" \
+          --out "/app/foundry/out" \
+          --lib-paths "/app/foundry/lib" \
+          --use "$$SOLIDITY_VERSION" \
+          --evm-version "$$EVM_VERSION"
