@@ -24,5 +24,4 @@ jobs:
       - name: Push to GitLab
         run: |
           git remote add gitlab https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.rescale-project.eu/rescale/smart_contract_dev.git
-          git push -f gitlab master
-
+          git push -f gitlab master:main
